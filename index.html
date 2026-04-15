@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car-tography of Signs: Builder</title>
+    <style>
+        /* --- RACE TRACK DESIGN THEME --- */
+        body { 
+            font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif; 
+            background-color: #2c3e50;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; 
+            color: #ecf0f1;
+        }
+
+        .workshop-card { 
+            background: rgba(255, 255, 255, 0.95); 
+            width: 100%; 
+            max-width: 500px; 
+            padding: 40px; 
+            border-radius: 20px; 
+            border: 10px solid;
+            border-image: repeating-conic-gradient(#fff 0% 25%, #000 0% 50%) 80 / 10px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5); 
+            text-align: center; 
+            position: relative;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; animation: vroom 0.4s ease-out; }
+
+        @keyframes vroom { 
+            from { opacity: 0; transform: translateX(-50px) rotate(-3deg); } 
+            to { opacity: 1; transform: translateX(0) rotate(0deg); } 
+        }
+
+        h1 { font-size: 32px; color: #1a1a1a; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; text-shadow: 2px 2px #ffcc00; }
+        h3 { color: #e74c3c; margin-bottom: 25px; font-size: 22px; font-weight: 700; text-transform: uppercase; }
+        p { color: #333; line-height: 1.6; }
+
+        .btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 25px 0; }
+        .color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 20px 0; }
+        
+        .option-btn { 
+            padding: 18px; border: 3px solid #ddd; border-radius: 12px; background: #fff; cursor: pointer; transition: all 0.2s; 
+            font-weight: bold; font-size: 15px; text-transform: lowercase; box-shadow: 0 4px #ccc; position: relative; top: 0;
+        }
+        .option-btn:hover { border-color: #f1c40f; top: -2px; box-shadow: 0 6px #ccc;}
+        .option-btn:active { top: 3px; box-shadow: 0 1px #ccc; }
+        .option-btn.selected { border: 4px solid #2980b9 !important; background-color: #ecf0f1; transform: scale(1.05); box-shadow: 0 4px #2980b9; }
+
+        .c-red { background-color: #e74c3c; color: white; }
+        .c-orange { background-color: #e67e22; color: white; }
+        .c-yellow { background-color: #f1c40f; color: black; }
+        .c-green { background-color: #2ecc71; color: white; }
+        .c-blue { background-color: #3498db; color: white; }
+        .c-purple { background-color: #9b59b6; color: white; }
+        .c-pink { background-color: #fd79a8; color: black; }
+        .c-black { background-color: #2c3e50; color: white; }
+        .c-white { background-color: #ffffff; color: black; border: 2px solid #333; }
+        .c-brown { background-color: #8e6e46; color: white; }
+        .c-grey { background-color: #95a5a6; color: white; }
+
+        .nav-container { display: flex; gap: 10px; margin-top: 30px; }
+        
+        .nav-btn { 
+            padding: 18px; border: none; border-radius: 50px; background: #333; color: #fff; font-weight: 900; 
+            cursor: pointer; font-size: 16px; flex: 2; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 5px #1a1a1a;
+        }
+        .nav-btn:hover { background: #555; transform: translateY(-3px); box-shadow: 0 8px #1a1a1a; }
+        .nav-btn:active { transform: translateY(2px); box-shadow: 0 2px #1a1a1a; }
+
+        .back-btn { background: #bdc3c7; color: #2c3e50; flex: 1; box-shadow: 0 5px #7f8c8d; }
+        .back-btn:hover { background: #cacfd2; box-shadow: 0 8px #7f8c8d; }
+
+        .nav-btn:not(:disabled):not(.back-btn) { background: #27ae60; color: white; box-shadow: 0 5px #1e8449; animation: pulse 1.5s infinite; }
+        .nav-btn:disabled { background: #bdc3c7; color: #7f8c8d; cursor: not-allowed; box-shadow: none; animation: none;}
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(39, 174, 96, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+        }
+
+        .preview-box { 
+            margin-top: 25px; padding: 20px; background: #2c3e50; color: #f1c40f; border-radius: 12px; font-style: italic; 
+            border-left: 6px solid #f1c40f; min-height: 1.2em; line-height: 1.6; text-align: left; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); font-family: 'Courier New', monospace;
+        }
+
+        .custom-input { width: 100%; padding: 15px; border: 3px solid #ddd; border-radius: 12px; font-size: 16px; margin-top: 15px; box-sizing: border-box; font-family: 'Courier New', monospace; }
+        .secondary-btn { background: #3498db; color: white; margin-top: 15px; box-shadow: 0 5px #2980b9; flex: 1; }
+    </style>
+
+    <script>
+        let selectionData = { type: "", shape: "...", main: "...", border: "...", purposeFullSentence: "" };
+
+        function showPage(num) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(p => p.classList.remove('active'));
+            document.getElementById('page' + num).classList.add('active');
+            if(num === 6) preparePurposePage();
+            if(num === 7) finalizeDescription();
+        }
+
+        function handleOther(category, btn) {
+            let customValue = prompt("Please type your custom " + category + " (in lowercase):");
+            if (customValue && customValue.trim() !== "") {
+                let lowVal = customValue.toLowerCase();
+                if (category === 'shape') setShape(lowVal, btn);
+                if (category === 'main color') setMainColor(lowVal, btn);
+                if (category === 'border color') setBorderColor(lowVal, btn);
+            }
+        }
+
+        function setType(val, btn) {
+            selectionData.type = val.toLowerCase();
+            highlightBtn('.type-opt', btn);
+            document.getElementById('previewType').innerHTML = `My road sign is a <strong>${selectionData.type}</strong> sign.`;
+            document.getElementById('btnNext2').disabled = false;
+        }
+
+        function setShape(val, btn) {
+            selectionData.shape = val.toLowerCase();
+            highlightBtn('.shape-opt', btn);
+            document.getElementById('btnNext3').disabled = false;
+        }
+
+        function setMainColor(val, btn) {
+            selectionData.main = val.toLowerCase();
+            highlightBtn('.main-opt', btn);
+            document.getElementById('btnNext4').disabled = false;
+        }
+
+        function setBorderColor(val, btn) {
+            selectionData.border = val.toLowerCase();
+            highlightBtn('.border-opt', btn);
+            document.getElementById('previewFinal').innerHTML = `It is <strong>${selectionData.shape}</strong> and <strong>${selectionData.main}</strong> with a <strong>${selectionData.border}</strong> border.`;
+            document.getElementById('btnNext5').disabled = false;
+        }
+
+        function preparePurposePage() {
+            let promptBase = "";
+            let type = selectionData.type;
+            if(type === 'mandatory') promptBase = "The purpose of my road sign is to give an order that [input] must be done.";
+            else if(type === 'prohibitory') promptBase = "The purpose of my road sign is to give an order that [input] must not be done.";
+            else if(type === 'warning') promptBase = "The purpose of my road sign is to give warning of [input].";
+            else if(type === 'information') promptBase = "The purpose of my road sign is to give direction or guidance to [input].";
+            document.getElementById('purposePrompt').innerText = promptBase.replace("[input]", "...");
+        }
+
+        function updatePurposeText(val) {
+            let type = selectionData.type;
+            let lowVal = val.toLowerCase();
+            if(type === 'mandatory') selectionData.purposeFullSentence = `The purpose of my road sign is to give an order that ${lowVal} must be done.`;
+            else if(type === 'prohibitory') selectionData.purposeFullSentence = `The purpose of my road sign is to give an order that ${lowVal} must not be done.`;
+            else if(type === 'warning') selectionData.purposeFullSentence = `The purpose of my road sign is to give warning of ${lowVal}.`;
+            else if(type === 'information') selectionData.purposeFullSentence = `The purpose of my road sign is to give direction or guidance to ${lowVal}.`;
+            document.getElementById('btnFinish').disabled = (val.trim() === "");
+        }
+
+        function finalizeDescription() {
+            const finalP = `My road sign is a ${selectionData.type} sign. It is ${selectionData.shape} and ${selectionData.main} with a ${selectionData.border} border. ${selectionData.purposeFullSentence}`;
+            document.getElementById('finalDescription').innerText = finalP;
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('finalDescription').innerText;
+            navigator.clipboard.writeText(text).then(() => { alert("Description copied to clipboard!"); });
+        }
+
+        function highlightBtn(className, activeBtn) {
+            document.querySelectorAll(className).forEach(b => b.classList.remove('selected'));
+            activeBtn.classList.add('selected');
+        }
+    </script>
+</head>
+<body>
+
+<div class="workshop-card">
+    
+    <div id="page1" class="page active">
+        <h1>Car-tography of Signs</h1>
+        <p>Ready to put your design into <strong>top gear</strong>? Use this tool to build the visual grammar of your sign. Don't worry, there are no <strong>roadblocks</strong> here—just follow the steps to create a description that's truly <strong>exhaust</strong>-ive!</p>
+        <button class="nav-btn" onclick="showPage(2)">start your engines</button>
+    </div>
+
+    <div id="page2" class="page">
+        <h3>What type of road sign is it?</h3>
+        <div class="btn-grid">
+            <button class="option-btn type-opt" onclick="setType('mandatory', this)">mandatory</button>
+            <button class="option-btn type-opt" onclick="setType('prohibitory', this)">prohibitory</button>
+            <button class="option-btn type-opt" onclick="setType('warning', this)">warning</button>
+            <button class="option-btn type-opt" onclick="setType('information', this)">information</button>
+        </div>
+        <div class="preview-box" id="previewType">My road sign is a ... sign.</div>
+        <div class="nav-container">
+            <button class="nav-btn back-btn" onclick="showPage(1)">back</button>
+            <button id="btnNext2" class="nav-btn" disabled onclick="showPage(3)">next</button>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <h3>What shape is the road sign?</h3>
+        <div class="btn-grid">
+            <button class="option-btn shape-opt" onclick="setShape('circular', this)">circular</button>
+            <button class="option-btn shape-opt" onclick="setShape('triangular', this)">triangular</button>
+            <button class="option-btn shape-opt" onclick="setShape('rectangular', this)">rectangular</button>
+            <button class="option-btn shape-opt" onclick="setShape('diamond', this)">diamond</button>
+            <button class="option-btn shape-opt" onclick="setShape('square', this)">square</button>
+            <button class="option-btn shape-opt" onclick="handleOther('shape', this)">other...</button>
+        </div>
+        <div class="nav-container">
+            <button class="nav-btn back-btn" onclick="showPage(2)">back</button>
+            <button id="btnNext3" class="nav-btn" disabled onclick="showPage(4)">next</button>
+        </div>
+    </div>
+
+    <div id="page4" class="page">
+        <h3>What is the main colour?</h3>
+        <div class="color-grid">
+            <button class="option-btn main-opt c-red" onclick="setMainColor('red', this)">red</button>
+            <button class="option-btn main-opt c-orange" onclick="setMainColor('orange', this)">orange</button>
+            <button class="option-btn main-opt c-yellow" onclick="setMainColor('yellow', this)">yellow</button>
+            <button class="option-btn main-opt c-green" onclick="setMainColor('green', this)">green</button>
+            <button class="option-btn main-opt c-blue" onclick="setMainColor('blue', this)">blue</button>
+            <button class="option-btn main-opt c-purple" onclick="setMainColor('purple', this)">purple</button>
+            <button class="option-btn main-opt c-pink" onclick="setMainColor('pink', this)">pink</button>
+            <button class="option-btn main-opt c-black" onclick="setMainColor('black', this)">black</button>
+            <button class="option-btn main-opt c-white" onclick="setMainColor('white', this)">white</button>
+            <button class="option-btn main-opt c-brown" onclick="setMainColor('brown', this)">brown</button>
+            <button class="option-btn main-opt c-grey" onclick="setMainColor('grey', this)">grey</button>
+            <button class="option-btn main-opt" onclick="handleOther('main color', this)">other...</button>
+        </div>
+        <div class="nav-container">
+            <button class="nav-btn back-btn" onclick="showPage(3)">back</button>
+            <button id="btnNext4" class="nav-btn" disabled onclick="showPage(5)">next</button>
+        </div>
+    </div>
+
+    <div id="page5" class="page">
+        <h3>What colour is the border?</h3>
+        <div class="color-grid">
+            <button class="option-btn border-opt c-red" onclick="setBorderColor('red', this)">red</button>
+            <button class="option-btn border-opt c-orange" onclick="setBorderColor('orange', this)">orange</button>
+            <button class="option-btn border-opt c-yellow" onclick="setBorderColor('yellow', this)">yellow</button>
+            <button class="option-btn border-opt c-green" onclick="setBorderColor('green', this)">green</button>
+            <button class="option-btn border-opt c-blue" onclick="setBorderColor('blue', this)">blue</button>
+            <button class="option-btn border-opt c-purple" onclick="setBorderColor('purple', this)">purple</button>
+            <button class="option-btn border-opt c-pink" onclick="setBorderColor('pink', this)">pink</button>
+            <button class="option-btn border-opt c-black" onclick="setBorderColor('black', this)">black</button>
+            <button class="option-btn border-opt c-white" onclick="setBorderColor('white', this)">white</button>
+            <button class="option-btn border-opt c-brown" onclick="setBorderColor('brown', this)">brown</button>
+            <button class="option-btn border-opt c-grey" onclick="setBorderColor('grey', this)">grey</button>
+            <button class="option-btn border-opt" onclick="handleOther('border color', this)">other...</button>
+        </div>
+        <div class="preview-box" id="previewFinal">It is ... and ... with a ... border.</div>
+        <div class="nav-container">
+            <button class="nav-btn back-btn" onclick="showPage(4)">back</button>
+            <button id="btnNext5" class="nav-btn" disabled onclick="showPage(6)">next</button>
+        </div>
+    </div>
+
+    <div id="page6" class="page">
+        <h3>Purpose of the Sign</h3>
+        <p id="purposePrompt" style="font-weight: bold; color: #333; margin-bottom: 5px;"></p>
+        <input type="text" class="custom-input" placeholder="type the missing part here..." oninput="updatePurposeText(this.value)">
+        <div class="nav-container">
+            <button class="nav-btn back-btn" onclick="showPage(5)">back</button>
+            <button id="btnFinish" class="nav-btn" disabled onclick="showPage(7)">generate final report</button>
+        </div>
+    </div>
+
+    <div id="page7" class="page">
+        <h1>Masterpiece Description</h1>
+        <div class="preview-box" id="finalDescription"></div>
+        <div class="nav-container">
+            <button class="nav-btn back-btn" onclick="showPage(6)">back</button>
+            <button class="nav-btn secondary-btn" onclick="copyToClipboard()">📋 copy</button>
+        </div>
+        <button class="nav-btn" style="margin-top:10px" onclick="window.open('https://padlet.com/misslouisefung/car-tography-of-signs-8e8bqnl2irtxcd5i', '_blank')">
+            🚀 upload to padlet
+        </button>
+    </div>
+
+</div>
+</body>
+</html>
