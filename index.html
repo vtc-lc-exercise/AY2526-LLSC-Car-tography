@@ -98,8 +98,10 @@
             right: -15px;
             top: -12px;
             font-size: 28px;
-            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));
-            transition: transform 0.2s;
+            /* Flip the car horizontally so it faces right */
+            transform: scaleX(-1);
+            /* Adjust drop shadow for the flipped element */
+            filter: drop-shadow(-2px 2px 2px rgba(0,0,0,0.3));
         }
 
         /* --- BOTTOM RIGHT VOCAB BUTTON (Pages 2-7) --- */
@@ -226,22 +228,58 @@
         .secondary-btn { background: #3498db; color: white; margin-top: 15px; box-shadow: 0 6px #2980b9; flex: 1; animation: none !important;}
         .secondary-btn:hover { background: #2980b9; }
 
-        /* --- VOCAB MODAL --- */
+        /* --- VOCAB MODAL (With Morph Animation & Sticky Header) --- */
         .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;
+            visibility: hidden; opacity: 0;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000; 
+            display: flex; justify-content: center; align-items: center;
             backdrop-filter: blur(5px);
+            transition: visibility 0.4s, opacity 0.4s ease;
         }
+        .modal-overlay.show {
+            visibility: visible; opacity: 1;
+        }
+        
         .modal-content {
             background: #fff; width: 90%; max-width: 650px; max-height: 85vh; border-radius: 20px;
-            padding: 30px; overflow-y: auto; position: relative; border: 5px solid #34495e;
+            padding: 0 30px 30px 30px; /* Adjusted padding for sticky header */
+            overflow-y: auto; position: relative; border: 5px solid #34495e;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            
+            /* Morph Animation Initial State */
+            transform: scale(0.8) translateY(30px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+        .modal-overlay.show .modal-content {
+            /* Morph Animation Final State */
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        /* Sticky Header inside Modal */
+        .modal-header {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+            padding: 25px 0 15px 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h2 {
+            color: #2c3e50; text-transform: uppercase; margin: 0; font-size: 24px;
+        }
+        
         .close-modal {
-            position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold;
+            font-size: 32px; font-weight: bold; line-height: 1;
             color: #e74c3c; cursor: pointer; transition: 0.2s;
         }
-        .close-modal:hover { color: #c0392b; transform: scale(1.2); }
+        .close-modal:hover { color: #c0392b; transform: scale(1.2) rotate(90deg); }
         
         .vocab-section { margin-bottom: 25px; text-align: left; }
         .vocab-section h4 { color: #2980b9; border-bottom: 2px solid #bdc3c7; padding-bottom: 5px; margin-bottom: 15px; font-size: 20px; text-transform: uppercase;}
@@ -266,6 +304,8 @@
             .bottom-vocab-btn { bottom: 15px; right: 15px; font-size: 14px; padding: 10px 15px; }
             .progress-car { font-size: 20px; top: -8px; right: -10px; }
             .option-btn { min-width: 100px; padding: 12px 16px; }
+            .modal-content { padding: 0 20px 20px 20px; }
+            .modal-header { padding: 20px 0 10px 0; }
         }
     </style>
 </head>
@@ -277,11 +317,14 @@
 <!-- Floating Vocab Button (Pages 2-7) -->
 <div class="bottom-vocab-btn" id="bottomVocabBtn" onclick="openVocab()">📚 Vocab</div>
 
-<!-- Vocab Modal -->
+<!-- Vocab Modal (With Morph & Sticky Header) -->
 <div class="modal-overlay" id="vocabModal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeVocab()">&times;</span>
-        <h2 style="color: #2c3e50; text-transform: uppercase; margin-top: 0;">📚 Vocab Pit Stop</h2>
+        <!-- Sticky Header -->
+        <div class="modal-header">
+            <h2>📚 Vocab Pit Stop</h2>
+            <span class="close-modal" onclick="closeVocab()">&times;</span>
+        </div>
         
         <div class="vocab-section">
             <h4>Type of Road Sign</h4>
@@ -290,6 +333,7 @@
             <div class="vocab-item"><span class="vocab-word">Warning <span class="vocab-pos">(adj.)</span><span class="vocab-chi">警告性</span></span><button class="speak-btn" onclick="speak('Warning')">🔊</button></div>
             <div class="vocab-item"><span class="vocab-word">Information <span class="vocab-pos">(n./adj.)</span><span class="vocab-chi">資訊性</span></span><button class="speak-btn" onclick="speak('Information')">🔊</button></div>
             <div class="vocab-item"><span class="vocab-word">Regulatory <span class="vocab-pos">(adj.)</span><span class="vocab-chi">管制性</span></span><button class="speak-btn" onclick="speak('Regulatory')">🔊</button></div>
+            <div class="vocab-item"><span class="vocab-word">Temporary <span class="vocab-pos">(adj.)</span><span class="vocab-chi">臨時性</span></span><button class="speak-btn" onclick="speak('Temporary')">🔊</button></div>
         </div>
 
         <div class="vocab-section">
@@ -297,6 +341,7 @@
             <div class="vocab-item"><span class="vocab-word">Circular <span class="vocab-pos">(adj.)</span><span class="vocab-chi">圓形</span></span><button class="speak-btn" onclick="speak('Circular')">🔊</button></div>
             <div class="vocab-item"><span class="vocab-word">Triangular <span class="vocab-pos">(adj.)</span><span class="vocab-chi">三角形</span></span><button class="speak-btn" onclick="speak('Triangular')">🔊</button></div>
             <div class="vocab-item"><span class="vocab-word">Rectangular <span class="vocab-pos">(adj.)</span><span class="vocab-chi">長方形</span></span><button class="speak-btn" onclick="speak('Rectangular')">🔊</button></div>
+            <div class="vocab-item"><span class="vocab-word">Square <span class="vocab-pos">(n./adj.)</span><span class="vocab-chi">正方形</span></span><button class="speak-btn" onclick="speak('Square')">🔊</button></div>
             <div class="vocab-item"><span class="vocab-word">Diamond <span class="vocab-pos">(n./adj.)</span><span class="vocab-chi">菱形</span></span><button class="speak-btn" onclick="speak('Diamond')">🔊</button></div>
             <div class="vocab-item"><span class="vocab-word">Octagonal <span class="vocab-pos">(adj.)</span><span class="vocab-chi">八角形</span></span><button class="speak-btn" onclick="speak('Octagonal')">🔊</button></div>
             <div class="vocab-item"><span class="vocab-word">Cross <span class="vocab-pos">(n.)</span><span class="vocab-chi">十字形</span></span><button class="speak-btn" onclick="speak('Cross')">🔊</button></div>
@@ -350,6 +395,7 @@
             <button class="option-btn type-opt" onclick="setType('warning', this)">warning</button>
             <button class="option-btn type-opt" onclick="setType('information', this)">information</button>
             <button class="option-btn type-opt" onclick="setType('regulatory', this)">regulatory</button>
+            <button class="option-btn type-opt" onclick="setType('temporary', this)">temporary</button>
         </div>
         <div class="preview-box" id="previewType">My road sign is a ... sign.</div>
         <div class="nav-container">
@@ -364,6 +410,7 @@
             <button class="option-btn shape-opt" onclick="setShape('circular', this)">circular</button>
             <button class="option-btn shape-opt" onclick="setShape('triangular', this)">triangular</button>
             <button class="option-btn shape-opt" onclick="setShape('rectangular', this)">rectangular</button>
+            <button class="option-btn shape-opt" onclick="setShape('square', this)">square</button>
             <button class="option-btn shape-opt" onclick="setShape('diamond', this)">diamond</button>
             <button class="option-btn shape-opt" onclick="setShape('octagonal', this)">octagonal</button>
             <button class="option-btn shape-opt" onclick="setShape('cross', this)">cross</button>
@@ -473,12 +520,12 @@
         window.speechSynthesis.speak(utterance);
     }
 
-    // --- VOCAB MODAL LOGIC ---
+    // --- VOCAB MODAL LOGIC (With Morph Class) ---
     function openVocab() {
-        document.getElementById('vocabModal').style.display = 'flex';
+        document.getElementById('vocabModal').classList.add('show');
     }
     function closeVocab() {
-        document.getElementById('vocabModal').style.display = 'none';
+        document.getElementById('vocabModal').classList.remove('show');
         window.speechSynthesis.cancel(); 
     }
 
