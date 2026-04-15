@@ -315,7 +315,7 @@
 <!-- Floating Vocab Button (Pages 2-7) -->
 <div class="bottom-vocab-btn" id="bottomVocabBtn" onclick="openVocab()">📚 Vocab</div>
 
-<!-- Vocab Modal (With Morph & Sticky Header) -->
+<!-- Vocab Modal -->
 <div class="modal-overlay" id="vocabModal">
     <div class="modal-content">
         <!-- Sticky Header -->
@@ -395,7 +395,7 @@
             <button class="option-btn type-opt" onclick="setType('regulatory', this)">regulatory</button>
             <button class="option-btn type-opt" onclick="setType('temporary', this)">temporary</button>
         </div>
-        <div class="preview-box" id="previewType">My road sign is a ... sign.</div>
+        <div class="preview-box" id="previewType">My road sign is a/an ... sign.</div>
         <div class="nav-container">
             <button class="nav-btn back-btn" onclick="showPage(1)">back</button>
             <button id="btnNext2" class="nav-btn" disabled onclick="showPage(3)">next 💨</button>
@@ -458,7 +458,7 @@
             <button class="option-btn border-opt c-grey" onclick="setBorderColor('grey', this)">grey</button>
             <button class="option-btn border-opt" onclick="handleOther('border color', this)">other...</button>
         </div>
-        <div class="preview-box" id="previewFinal">It is ... and ... with a ... border.</div>
+        <div class="preview-box" id="previewFinal">It is ... and ... with a/an ... border.</div>
         <div class="nav-container">
             <button class="nav-btn back-btn" onclick="showPage(4)">back</button>
             <button id="btnNext5" class="nav-btn" disabled onclick="showPage(6)">next 💨</button>
@@ -545,17 +545,23 @@
             }
 
             var particleCount = 50 * (timeLeft / duration);
-            // 從左邊噴射
             confetti(Object.assign({}, defaults, { 
                 particleCount,
                 origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
             }));
-            // 從右邊噴射
             confetti(Object.assign({}, defaults, { 
                 particleCount,
                 origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
             }));
         }, 250);
+    }
+
+    // --- HELPER FUNCTION: GET ARTICLE (A / AN) ---
+    function getArticle(word) {
+        if (!word || word === "...") return "a/an";
+        const vowels = ['a', 'e', 'i', 'o', 'u'];
+        const firstLetter = word.charAt(0).toLowerCase();
+        return vowels.includes(firstLetter) ? "an" : "a";
     }
 
     // --- APP LOGIC ---
@@ -589,7 +595,6 @@
         
         if(num === 7) {
             finalizeDescription();
-            // 觸發衝線紙碎動畫
             triggerConfetti();
         }
     }
@@ -607,7 +612,11 @@
     function setType(val, btn) {
         selectionData.type = val.toLowerCase();
         highlightBtn('.type-opt', btn);
-        document.getElementById('previewType').innerHTML = `My road sign is a <strong>${selectionData.type}</strong> sign.`;
+        
+        // 使用 getArticle 自動配對 a 或 an
+        let article = getArticle(selectionData.type);
+        document.getElementById('previewType').innerHTML = `My road sign is ${article} <strong>${selectionData.type}</strong> sign.`;
+        
         document.getElementById('btnNext2').disabled = false;
     }
 
@@ -633,7 +642,9 @@
     }
     
     function updateFinalPreview() {
-        document.getElementById('previewFinal').innerHTML = `It is <strong>${selectionData.shape}</strong> and <strong>${selectionData.main}</strong> with a <strong>${selectionData.border}</strong> border.`;
+        // 邊框顏色 (例如 orange border) 都需要判斷 a / an
+        let borderArticle = getArticle(selectionData.border);
+        document.getElementById('previewFinal').innerHTML = `It is <strong>${selectionData.shape}</strong> and <strong>${selectionData.main}</strong> with ${borderArticle} <strong>${selectionData.border}</strong> border.`;
     }
 
     function updatePurposeText(val) {
@@ -643,7 +654,10 @@
     }
 
     function finalizeDescription() {
-        const finalP = `My road sign is a ${selectionData.type} sign. It is ${selectionData.shape} and ${selectionData.main} with a ${selectionData.border} border. ${selectionData.purposeFullSentence}`;
+        let typeArticle = getArticle(selectionData.type);
+        let borderArticle = getArticle(selectionData.border);
+        
+        const finalP = `My road sign is ${typeArticle} ${selectionData.type} sign. It is ${selectionData.shape} and ${selectionData.main} with ${borderArticle} ${selectionData.border} border. ${selectionData.purposeFullSentence}`;
         document.getElementById('finalDescription').innerText = finalP;
     }
 
