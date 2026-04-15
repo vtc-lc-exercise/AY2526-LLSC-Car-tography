@@ -71,7 +71,9 @@
             margin-bottom: 30px;
             padding-bottom: 15px;
             border-bottom: 2px dashed #bdc3c7;
-            white-space: nowrap;
+            /* 移除 nowrap，允許自動換行 */
+            white-space: normal; 
+            line-height: 1.4; /* 增加行距令換行後更美觀 */
         }
 
         .progress-container {
