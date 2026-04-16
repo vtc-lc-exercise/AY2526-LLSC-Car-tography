@@ -312,7 +312,7 @@
 <!-- Floating Emojis Background -->
 <div class="emoji-container" id="emojiContainer"></div>
 
-<!-- Floating Vocab Button (Pages 2-7) -->
+<!-- Floating Vocab Button (Pages 2-8) -->
 <div class="bottom-vocab-btn" id="bottomVocabBtn" onclick="openVocab()">📚 Vocab</div>
 
 <!-- Vocab Modal -->
@@ -367,7 +367,7 @@
         Language Centre x ProAct (Automotive Technology)
     </div>
 
-    <!-- Progress Bar (Shows on Page 2-7) -->
+    <!-- Progress Bar (Shows on Page 2-8) -->
     <div class="progress-container" id="progressContainer">
         <div class="progress-bar" id="progressBar">
             <span class="progress-car">🚗</span>
@@ -471,17 +471,57 @@
         <input type="text" class="custom-input" placeholder="e.g. stop the vehicle and warn drivers..." oninput="updatePurposeText(this.value)">
         <div class="nav-container">
             <button class="nav-btn back-btn" onclick="showPage(5)">back</button>
-            <button id="btnFinish" class="nav-btn" disabled onclick="showPage(7)">generate report 🛠️</button>
+            <button id="btnNext6" class="nav-btn" disabled onclick="showPage(7)">next 💨</button>
         </div>
     </div>
 
+    <!-- Page 7 學生資料 -->
     <div id="page7" class="page">
-        <h1>Masterpiece Description</h1>
-        <div class="preview-box" id="finalDescription"></div>
+        <h3>Student Information</h3>
+        <div style="text-align: left; margin-top: 20px;">
+            <p style="font-weight: bold; color: #333; margin-bottom: 5px; font-size: 18px;">Class Code:</p>
+            <div style="display: flex; gap: 10px;">
+                <select id="classPrefix" class="custom-input" style="width: 35%; margin-top: 0;">
+                    <option value="FS1133">FS1133</option>
+                    <option value="FS1136">FS1136</option>
+                    <option value="FS3133">FS3133</option>
+                    <option value="FS3134">FS3134</option>
+                </select>
+                <input type="text" id="classSuffix" class="custom-input" style="width: 65%; margin-top: 0;" placeholder="e.g. 86/1A" oninput="checkStudentInfo()">
+            </div>
+
+            <p style="font-weight: bold; color: #333; margin-top: 25px; margin-bottom: 5px; font-size: 18px;">Full Name:</p>
+            <input type="text" id="studentName" class="custom-input" style="margin-top: 0;" placeholder="e.g. Chan Tai Man" oninput="checkStudentInfo()">
+        </div>
+
         <div class="nav-container">
             <button class="nav-btn back-btn" onclick="showPage(6)">back</button>
+            <button id="btnFinish" class="nav-btn" disabled onclick="showPage(8)">generate report 🛠️</button>
+        </div>
+    </div>
+
+    <!-- Page 8 -->
+    <div id="page8" class="page">
+        <h1>Masterpiece Description</h1>
+        
+        <!-- 展示區 (不再用來截圖) -->
+        <div style="background: #2c3e50; padding: 30px; border-radius: 15px; border: 5px solid #f1c40f; margin-bottom: 20px; position: relative;">
+            <h2 style="color: #f1c40f; margin-top: 0; text-transform: uppercase; border-bottom: 2px dashed #f1c40f; padding-bottom: 10px; font-size: 22px;">Sign Description</h2>
+            <div class="preview-box" id="finalDescription" style="box-shadow: none; border: none; padding: 0; margin-top: 15px; font-size: 18px; background: transparent;"></div>
+            
+            <div style="margin-top: 30px; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; text-align: right; border-left: 5px solid #e67e22;">
+                <p style="margin: 0; color: #ecf0f1; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Sign Designer</p>
+                <p id="displayName" style="margin: 5px 0 0 0; color: #f1c40f; font-size: 22px; font-weight: bold;"></p>
+                <p id="displayClass" style="margin: 5px 0 0 0; color: #bdc3c7; font-size: 16px;"></p>
+            </div>
+        </div>
+
+        <div class="nav-container" style="margin-top: 20px;">
+            <button class="nav-btn back-btn" onclick="showPage(7)">back</button>
+            <!-- Copy Text 按鈕 -->
             <button class="nav-btn secondary-btn" onclick="copyToClipboard()">📋 copy text</button>
         </div>
+
         <button class="nav-btn" style="margin-top:15px; width: 100%;" onclick="window.open('https://padlet.com/misslouisefung/car-tography-of-signs-8e8bqnl2irtxcd5i', '_blank')">
             🚀 upload to padlet
         </button>
@@ -589,11 +629,12 @@
             progressContainer.style.display = 'block';
             bottomVocabBtn.style.display = 'block'; 
             
-            const progressPercent = ((num - 1) / 6) * 100;
+            // 更新進度條 (總共 8 頁，所以除以 7)
+            const progressPercent = ((num - 1) / 7) * 100;
             progressBar.style.width = progressPercent + '%';
         }
         
-        if(num === 7) {
+        if(num === 8) {
             finalizeDescription();
             triggerConfetti();
         }
@@ -613,7 +654,6 @@
         selectionData.type = val.toLowerCase();
         highlightBtn('.type-opt', btn);
         
-        // 使用 getArticle 自動配對 a 或 an
         let article = getArticle(selectionData.type);
         document.getElementById('previewType').innerHTML = `My road sign is ${article} <strong>${selectionData.type}</strong> sign.`;
         
@@ -642,7 +682,6 @@
     }
     
     function updateFinalPreview() {
-        // 邊框顏色 (例如 orange border) 都需要判斷 a / an
         let borderArticle = getArticle(selectionData.border);
         document.getElementById('previewFinal').innerHTML = `It is <strong>${selectionData.shape}</strong> and <strong>${selectionData.main}</strong> with ${borderArticle} <strong>${selectionData.border}</strong> border.`;
     }
@@ -650,7 +689,14 @@
     function updatePurposeText(val) {
         let lowVal = val.toLowerCase();
         selectionData.purposeFullSentence = `The purpose of my road sign is to ${lowVal}.`;
-        document.getElementById('btnFinish').disabled = (val.trim() === "");
+        document.getElementById('btnNext6').disabled = (val.trim() === "");
+    }
+
+    // 檢查學生資料是否填妥
+    function checkStudentInfo() {
+        const suffix = document.getElementById('classSuffix').value;
+        const name = document.getElementById('studentName').value;
+        document.getElementById('btnFinish').disabled = (suffix.trim() === "" || name.trim() === "");
     }
 
     function finalizeDescription() {
@@ -659,20 +705,36 @@
         
         const finalP = `My road sign is ${typeArticle} ${selectionData.type} sign. It is ${selectionData.shape} and ${selectionData.main} with ${borderArticle} ${selectionData.border} border. ${selectionData.purposeFullSentence}`;
         document.getElementById('finalDescription').innerText = finalP;
+
+        // 更新名牌
+        const prefix = document.getElementById('classPrefix').value;
+        const suffix = document.getElementById('classSuffix').value;
+        const name = document.getElementById('studentName').value;
+        
+        document.getElementById('displayName').innerText = name;
+        document.getElementById('displayClass').innerText = `[${prefix} ${suffix}]`;
     }
 
+    // 複製文字功能 (包含學生資料及描述)
     function copyToClipboard() {
-        const text = document.getElementById('finalDescription').innerText;
-        navigator.clipboard.writeText(text).then(() => { 
-            alert("Description copied to clipboard! 🚗💨"); 
+        const description = document.getElementById('finalDescription').innerText;
+        const name = document.getElementById('displayName').innerText;
+        const classInfo = document.getElementById('displayClass').innerText;
+        
+        // 組合要複製的文字格式
+        const fullTextToCopy = `${classInfo} ${name}\n\n${description}`;
+
+        navigator.clipboard.writeText(fullTextToCopy).then(() => { 
+            alert("Text copied to clipboard! 🚗💨\n\nYou can now paste it into Padlet."); 
         }).catch(err => {
+            // Fallback for older browsers
             const textarea = document.createElement('textarea');
-            textarea.value = text;
+            textarea.value = fullTextToCopy;
             document.body.appendChild(textarea);
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-            alert("Description copied to clipboard! 🚗💨");
+            alert("Text copied to clipboard! 🚗💨\n\nYou can now paste it into Padlet.");
         });
     }
 
